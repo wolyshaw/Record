@@ -12,7 +12,18 @@ const HomeScreen = StackNavigator({
   Home: { screen: Home },
   Create: { screen: Create },
 }, {
-  headerMode: 'none'
+  navigationOptions:{
+    headerStyle: {
+      backgroundColor: '#E21A43',
+    },
+    headerTitleStyle: {
+      color: '#fff'
+    },
+    headerBackTitleStyle: {
+      color: '#fff'
+    }
+  }
+  // headerMode: 'none'
 })
 
 export default HomeScreen

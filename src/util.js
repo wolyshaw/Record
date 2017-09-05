@@ -1,10 +1,9 @@
 import AV from 'leancloud-storage'
+import config from '../config'
 
-const APP_ID = 'u30w6ylce91cpx7bm98wkm5d1h2tr0kn6bknjmjw8c0g9ubj'
+let { APP_ID, APP_KEY } = config.leancloud
 
-const APP_KEY = 'dkryk8xq8xfl705pp4wckim7ru81sebgig1k5szdt28qwyvd'
-
-export const lean = AV.init({
+AV.initialize({
   appId: APP_ID,
   appKey: APP_KEY
 })

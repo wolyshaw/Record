@@ -6,31 +6,92 @@ import {
   Image,
   StatusBar,
   ScrollView,
+  DatePickerIOS,
+  ActionSheetIOS,
   TouchableOpacity
 } from 'react-native'
 import { lean } from '../../util'
 import AV from 'leancloud-storage'
 
-let query = new AV.Query('_User')
+import Login from '../../modals/Login'
+
+let query = new AV.Query('Contents')
 
 export default class Home extends Component {
+  static navigationOptions = ({ navigation, screenProps }) => ({
+    title: '记录',
+    headerRight: (
+      <TouchableOpacity onPress={ () => navigation.navigate('Create') }>
+        <Image
+          style={{ width: 20, height: 20, paddingRight: 10 }}
+          source={ require('../../../static/add.png') }
+        />
+      </TouchableOpacity>
+    )
+  })
+
+  constructor(props) {
+    super(...props)
+    this.state = {
+      list: [],
+      contents: [],
+      avatarSource: null,
+      login: null
+    }
+  }
+
+  componentWillMount() {
+    var user = new AV.User();
+// 设置用户名
+user.setUsername('wolyshaw');
+// 设置密码
+user.setPassword('record');
+// 设置邮箱
+user.setEmail('shaw@xwlong.com');
+user.signUp().then(function (loginedUser) {
+    console.log(loginedUser);
+}, function (error) {
+  console.log(error)
+});
+    // AV.User.logIn('Tom', 'cat!@#123').then(user => console.log(AV.User.current()), err => console.log(err))
+    // AV.User.logOut()
+    AV.User.currentAsync().then(user => {
+      console.log(user)
+      this.setState({login: user}, () => {
+        if (this.state.login) {
+          query.find().then(r => this.setState({contents: r}, () => console.log(r)))
+        }
+      })
+    })
+  }
+
+  addZore = num => num < 10 ? '0' + num : num
+
   render() {
     return (
-      <View style={ styles.container }>
+      <ScrollView style={ styles.container }>
         <StatusBar
           barStyle="light-content"
         />
-        <View style={ styles.header }>
-          <View></View>
-          <Text style={ styles.title }>记录</Text>
-          <TouchableOpacity onPress={ () => this.props.navigation.navigate('Create')}>
-            <Image style={ styles.icon } source={ require('../../../static/add.png') }/>
-          </TouchableOpacity>
-        </View>
-        <ScrollView>
-
-        </ScrollView>
-      </View>
+        {
+          this.state.contents.map(item => {
+            let time = new Date(item.createdAt)
+            return (
+              <View key={item.id} style={ styles.contents }>
+                <View style={ styles.content }>
+                  <Text style={ styles.data }>
+                    {
+                      `${this.addZore(time.getMonth() + 1)}/${this.addZore(time.getDay())}`
+                    }
+                    </Text>
+                </View>
+                <Text style={ styles.content }>{item.attributes.content}</Text>
+              </View>
+            )
+          })
+        }
+        <Login open={!this.state.login}/>
+      </ScrollView>
     )
   }
 }
@@ -40,23 +101,40 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     flex: 1
   },
-  header: {
-    backgroundColor: '#E21A43',
-    paddingTop: 30,
-    paddingBottom: 10,
-    paddingLeft: 10,
-    paddingRight: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  title: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    alignSelf: 'center'
-  },
   icon: {
     width: 20,
     height: 20
+  },
+  uploadAvatar: {
+    width: 100,
+    height: 100,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+  contents: {
+    padding: 10,
+    flexDirection: 'row',
+  },
+  content: {
+
+  },
+  data: {
+    width: 50,
+    height: 50,
+    textAlign: 'center',
+    lineHeight: 50,
+    backgroundColor: '#E21A43',
+    color: '#fff',
+    borderRadius: 25,
+    borderColor: '#E21A43',
+    overflow: 'hidden',
+    marginRight: 20
+  },
+  imagelist: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    width: 100,
+    height: 100,
+    margin: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   }
 })
