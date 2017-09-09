@@ -41,19 +41,18 @@ export default class Home extends Component {
   }
 
   componentWillMount() {
-    var user = new AV.User();
-// 设置用户名
-user.setUsername('wolyshaw');
-// 设置密码
-user.setPassword('record');
-// 设置邮箱
-user.setEmail('shaw@xwlong.com');
-user.signUp().then(function (loginedUser) {
-    console.log(loginedUser);
-}, function (error) {
-  console.log(error)
-});
-    // AV.User.logIn('Tom', 'cat!@#123').then(user => console.log(AV.User.current()), err => console.log(err))
+//     var user = new AV.User();
+// // 设置用户名
+// user.setUsername('wolyshaw');
+// // 设置密码
+// user.setPassword('record');
+// // 设置邮箱
+// user.setEmail('shaw@xwlong.com');
+// user.signUp().then(function (loginedUser) {
+//     console.log(loginedUser);
+// }, function (error) {
+//   console.log(error)
+// });
     // AV.User.logOut()
     AV.User.currentAsync().then(user => {
       console.log(user)
