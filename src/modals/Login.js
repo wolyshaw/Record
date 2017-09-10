@@ -10,6 +10,8 @@ import {
   ScrollView,
   TouchableOpacity
 } from 'react-native'
+import { lean, dispatch } from '../util'
+import { userinfo } from '../actions/user'
 import AV from 'leancloud-storage'
 
 export default class Login extends Component {
@@ -24,7 +26,7 @@ export default class Login extends Component {
 
   _login() {
     AV.User.logIn(this.state.nice_name, this.state.password)
-      .then(user => console.log(AV.User.current()), err => console.log(err))
+      .then(user => dispatch(userinfo(user)), err => console.log(err))
   }
 
   render() {
@@ -37,14 +39,16 @@ export default class Login extends Component {
         <Modal
           animationType={'slide'}
           transparent={false}
-          visible={true}
+          visible={open === null}
           onRequestClose={() => {}}
         >
         <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 50, marginBottom: 50}}>
           <Image style={{marginTop: 20}} source={ require('../../static/logo.png') }/>
         </View>
         <View style={ styles.item }>
-          <Text style={ styles.name }>昵称：</Text>
+          <Text style={ styles.name }>
+            <Image style={{width: 20, height: 20}} source={ require('../../static/user.png') }/>
+          </Text>
           <TextInput
             style={ styles.value }
             placeholder="昵称"
@@ -56,7 +60,9 @@ export default class Login extends Component {
           />
         </View>
         <View style={ styles.item }>
-          <Text style={ styles.name }>密码：</Text>
+          <Text style={ styles.name }>
+            <Image style={{width: 20, height: 20}} source={ require('../../static/password.png') }/>
+          </Text>
           <TextInput
             ref="password"
             style={ styles.value }

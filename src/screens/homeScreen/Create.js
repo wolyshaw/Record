@@ -47,7 +47,8 @@ export default class Create extends Component {
     this.state = {
       list: [],
       contents: [],
-      avatarSource: null
+      avatarSource: null,
+      date: '请选择时间'
     }
   }
 
@@ -72,8 +73,6 @@ export default class Create extends Component {
           this.setState({
             avatarSource: source
           });
-          let data = new FormData()
-          data.append()
           let file = new AV.File(response.fileName, { blob: response });
           file.save().then(r => {
             console.log(r)
@@ -135,25 +134,25 @@ export default class Create extends Component {
 
 _showDatePicker() {
     Picker.init({
-        pickerData: this._createDateData(),
-        pickerToolBarFontSize: 16,
-        pickerFontSize: 16,
-        pickerTitleText: '请选择时间',
-        pickerConfirmBtnText: '确定',
-        pickerCancelBtnText: '取消',
-        pickerBg: [255, 255 ,255, 1],
-        pickerFontColor: [0, 0 ,0, 1],
-        onPickerConfirm: (pickedValue, pickedIndex) => {
-            console.log('date', pickedValue, pickedIndex);
-        },
-        onPickerCancel: (pickedValue, pickedIndex) => {
-            console.log('date', pickedValue, pickedIndex);
-        },
-        onPickerSelect: (pickedValue, pickedIndex) => {
-            console.log('date', pickedValue, pickedIndex);
-        }
+      pickerData: this._createDateData(),
+      pickerToolBarFontSize: 16,
+      pickerFontSize: 16,
+      pickerTitleText: '请选择时间',
+      pickerConfirmBtnText: '确定',
+      pickerCancelBtnText: '取消',
+      pickerBg: [255, 255 ,255, 1],
+      pickerFontColor: [0, 0 ,0, 1],
+      onPickerConfirm: (pickedValue, pickedIndex) => {
+        this.setState({ date: pickedValue.join(' ') })
+      },
+      onPickerCancel: (pickedValue, pickedIndex) => {
+          console.log('date', pickedValue, pickedIndex);
+      },
+      onPickerSelect: (pickedValue, pickedIndex) => {
+        this.setState({ date: pickedValue.join(' ') })
+      }
     });
-    Picker.show();
+    Picker.show()
 }
 
   render() {
@@ -164,12 +163,23 @@ _showDatePicker() {
         />
         <ScrollView>
           <View style={ styles.item }>
-            <Text style={ styles.name }>主题：</Text>
+            <Text style={ styles.name }>
+              <Image style={{width: 20, height: 20}} source={ require('../../../static/title.png') }/>
+            </Text>
             <TextInput style={ styles.value } placeholder="请输入主题最多不超过三个"/>
           </View>
-          <TouchableOpacity style={ styles.chooseTime } onPress={ this._showDatePicker.bind(this) }>
-            <Text>请选择时间</Text>
-          </TouchableOpacity>
+          <View style={ styles.item }>
+            <Text style={ styles.name }>
+              <Image style={{width: 20, height: 20}} source={ require('../../../static/date.png') }/>
+            </Text>
+            <TouchableOpacity style={ styles.chooseTime } onPress={ this._showDatePicker.bind(this) }>
+              <Text>{ this.state.date }</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={ styles.item }>
+            <Text style={ styles.name }>内容：</Text>
+            <TextInput style={ styles.content } placeholder="请输入内容" multiline/>
+          </View>
           <View style={ styles.images }>
             {
               this.state.list.map((item, index) => (
@@ -178,11 +188,16 @@ _showDatePicker() {
                 </TouchableOpacity>
               ))
             }
-          <TouchableOpacity style={styles.addImage} onPress={this.cameraAction.bind(this)}>
-            <Image style={ styles.addImage } source={require('../../../static/add_photos.png')}/>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.addImage} onPress={this.cameraAction.bind(this)}>
+              <Image style={ styles.addImage } source={require('../../../static/add_photos.png')}/>
+            </TouchableOpacity>
           </View>
-      </ScrollView>
+          <TouchableOpacity>
+            <View>
+              <Text style={{ borderRadius: 5, overflow: 'hidden', flex: 1, backgroundColor: '#E21A43', color: '#fff', textAlign: 'center', height: 40, lineHeight: 40, margin: 10 }}>提交</Text>
+            </View>
+          </TouchableOpacity>
+        </ScrollView>
       </View>
     )
   }
@@ -217,8 +232,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     // height: 40,
-    paddingLeft: 10,
-    paddingRight: 10,
+    padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0, 0, 0, .1)'
   },
@@ -231,10 +245,14 @@ const styles = StyleSheet.create({
     lineHeight: 40,
     fontSize: 14
   },
+  content: {
+    lineHeight: 40,
+    fontSize: 14,
+    height: 80,
+  },
   chooseTime: {
     marginTop: 10,
     marginBottom: 10,
-    padding: 10
   },
   uploadAvatar: {
     width: 100,
@@ -246,7 +264,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingLeft: 10,
-    paddingRight: 10
+    paddingRight: 10,
+    marginTop: 30
   },
   imagelist: {
     width: 100,

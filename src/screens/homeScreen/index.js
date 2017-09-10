@@ -9,8 +9,8 @@ import Home from './Home'
 import Create from './Create'
 
 const HomeScreen = StackNavigator({
-  Home: { screen: Home },
-  Create: { screen: Create },
+  Home: { screen: Home, path: 'Home' },
+  Create: { screen: Create, path: 'Create' },
 }, {
   navigationOptions:{
     headerStyle: {

@@ -10,14 +10,16 @@ import {
   ActionSheetIOS,
   TouchableOpacity
 } from 'react-native'
-import { lean } from '../../util'
+import { connect } from 'react-redux'
+import { lean, dispatch } from '../../util'
+import { userinfo } from '../../actions/user'
 import AV from 'leancloud-storage'
 
 import Login from '../../modals/Login'
 
 let query = new AV.Query('Contents')
 
-export default class Home extends Component {
+class Home extends Component {
   static navigationOptions = ({ navigation, screenProps }) => ({
     title: '记录',
     headerRight: (
@@ -35,8 +37,8 @@ export default class Home extends Component {
     this.state = {
       list: [],
       contents: [],
-      avatarSource: null,
-      login: null
+      avatarSource: {},
+      hidden: false
     }
   }
 
@@ -53,14 +55,14 @@ export default class Home extends Component {
 // }, function (error) {
 //   console.log(error)
 // });
+console.log(this.state)
     // AV.User.logOut()
+    this.setState({hidden: true})
     AV.User.currentAsync().then(user => {
-      console.log(user)
-      this.setState({login: user}, () => {
-        if (this.state.login) {
-          query.find().then(r => this.setState({contents: r}, () => console.log(r)))
-        }
-      })
+      dispatch(userinfo(user))
+      if (this.props.user) {
+        query.find().then(r => this.setState({contents: r}, () => console.log(r)))
+      }
     })
   }
 
@@ -89,11 +91,14 @@ export default class Home extends Component {
             )
           })
         }
-        <Login open={!this.state.login}/>
       </ScrollView>
     )
   }
 }
+
+const mapStateToProps = (state, ownProps) => state
+
+export default connect(mapStateToProps)(Home)
 
 const styles = StyleSheet.create({
   container: {
