@@ -12,7 +12,7 @@ import {
 } from 'react-native'
 import { connect } from 'react-redux'
 import { lean, dispatch } from '../../util'
-import { userinfo } from '../../actions/user'
+import { userinfo, loading } from '../../actions/user'
 import AV from 'leancloud-storage'
 
 import Login from '../../modals/Login'
@@ -25,7 +25,7 @@ class Home extends Component {
     headerRight: (
       <TouchableOpacity onPress={ () => navigation.navigate('Create') }>
         <Image
-          style={{ width: 20, height: 20, paddingRight: 10 }}
+          style={{ width: 20, height: 20, marginRight: 10 }}
           source={ require('../../../static/add.png') }
         />
       </TouchableOpacity>
@@ -35,14 +35,13 @@ class Home extends Component {
   constructor(props) {
     super(...props)
     this.state = {
-      list: [],
       contents: [],
-      avatarSource: {},
-      hidden: false
+      avatarSource: {}
     }
   }
 
   componentWillMount() {
+    dispatch(loading({visible: true}))
 //     var user = new AV.User();
 // // 设置用户名
 // user.setUsername('wolyshaw');
@@ -57,9 +56,9 @@ class Home extends Component {
 // });
 console.log(this.state)
     // AV.User.logOut()
-    this.setState({hidden: true})
     AV.User.currentAsync().then(user => {
       dispatch(userinfo(user))
+      dispatch(loading({visible: false}))
       if (this.props.user) {
         query.find().then(r => this.setState({contents: r}, () => console.log(r)))
       }
@@ -74,6 +73,9 @@ console.log(this.state)
         <StatusBar
           barStyle="light-content"
         />
+      <TouchableOpacity onPress={ () => console.log(1) }>
+          <Text>dinsji</Text>
+        </TouchableOpacity>
         {
           this.state.contents.map(item => {
             let time = new Date(item.createdAt)

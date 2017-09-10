@@ -3,11 +3,14 @@ import { Provider, connect } from 'react-redux'
 import {
   StyleSheet,
   Text,
-  View
+  View,
+  Modal,
+  ActivityIndicator
 } from 'react-native'
 import { appStore } from './util'
 import HomeScreen from './screens/homeScreen'
 import Login from './modals/Login'
+import Loading from './components/Loading'
 const mapStateToProps = (state, ownProps) => state
 
 const HomeScreenContent = connect(mapStateToProps)(HomeScreen)
@@ -17,6 +20,7 @@ const Container = props => {
     <View style={{flex: 1}}>
       <HomeScreen/>
       <Login open={props.user}/>
+      <Loading visible={props.loading.visible}/>
     </View>
   )
 }

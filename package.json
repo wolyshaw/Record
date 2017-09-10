@@ -11,6 +11,7 @@
 		"react": "16.0.0-alpha.12",
 		"react-native": "0.47.2",
 		"react-native-image-picker": "^0.26.4",
+		"react-native-loading-spinner-overlay": "^0.5.2",
 		"react-native-picker": "^4.1.2",
 		"react-native-scrollable-tab-view": "^0.6.7",
 		"react-navigation": "^1.0.0-beta.11",
