@@ -166,7 +166,7 @@ _showDatePicker() {
             <Text style={ styles.name }>
               <Image style={{width: 20, height: 20}} source={ require('../../../static/title.png') }/>
             </Text>
-            <TextInput style={ styles.value } placeholder="请输入主题最多不超过三个"/>
+            <TextInput style={ styles.value } placeholder="请输入主题"/>
           </View>
           <View style={ styles.item }>
             <Text style={ styles.name }>

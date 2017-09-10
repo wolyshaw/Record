@@ -19,9 +19,62 @@ import Login from '../../modals/Login'
 
 let query = new AV.Query('Contents')
 
+const addZore = num => num < 10 ? '0' + num : num
+
+const Contonts = props => {
+  return (
+    <View>
+      {
+        props.contents.map(item => {
+          let time = new Date(item.createdAt)
+          return (
+            <View key={item.id} style={ styles.contents }>
+              <View style={ styles.content }>
+                <Text style={ styles.data }>
+                  {
+                    `${addZore(time.getMonth() + 1)}/${addZore(time.getDay())}`
+                  }
+                  </Text>
+              </View>
+              <Text style={ styles.content }>{item.attributes.content}</Text>
+            </View>
+          )
+        })
+      }
+    </View>
+  )
+}
+
+const NullList = props => {
+  return (
+    <TouchableOpacity
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 80
+      }}
+      onPress={ props.onPress }
+    >
+      <Image
+        style={{ width: 80, height: 60, marginRight: 30 }}
+        source={ require('../../../static/null.png') }
+      />
+      <Text style={{ lineHeight: 60 }}>还没有记录，立刻去添加</Text>
+    </TouchableOpacity>
+  )
+}
+
 class Home extends Component {
   static navigationOptions = ({ navigation, screenProps }) => ({
     title: '记录',
+    headerLeft: (
+      <TouchableOpacity onPress={ () => navigation.navigate('Setting') }>
+        <Image
+          style={{ width: 20, height: 20, marginLeft: 10 }}
+          source={ require('../../../static/setting.png') }
+        />
+      </TouchableOpacity>
+    ),
     headerRight: (
       <TouchableOpacity onPress={ () => navigation.navigate('Create') }>
         <Image
@@ -54,7 +107,7 @@ class Home extends Component {
 // }, function (error) {
 //   console.log(error)
 // });
-console.log(this.state)
+console.log(this.props)
     // AV.User.logOut()
     AV.User.currentAsync().then(user => {
       dispatch(userinfo(user))
@@ -65,34 +118,13 @@ console.log(this.state)
     })
   }
 
-  addZore = num => num < 10 ? '0' + num : num
-
   render() {
     return (
       <ScrollView style={ styles.container }>
         <StatusBar
           barStyle="light-content"
         />
-      <TouchableOpacity onPress={ () => console.log(1) }>
-          <Text>dinsji</Text>
-        </TouchableOpacity>
-        {
-          this.state.contents.map(item => {
-            let time = new Date(item.createdAt)
-            return (
-              <View key={item.id} style={ styles.contents }>
-                <View style={ styles.content }>
-                  <Text style={ styles.data }>
-                    {
-                      `${this.addZore(time.getMonth() + 1)}/${this.addZore(time.getDay())}`
-                    }
-                    </Text>
-                </View>
-                <Text style={ styles.content }>{item.attributes.content}</Text>
-              </View>
-            )
-          })
-        }
+      { this.state.contents.length ? <Contents contents={this.state.contents}/> : <NullList onPress={ () => this.props.navigation.navigate('Create') }/> }
       </ScrollView>
     )
   }

@@ -7,10 +7,12 @@ import {
 import { StackNavigator } from 'react-navigation'
 import Home from './Home'
 import Create from './Create'
+import Setting from './Setting'
 
 const HomeScreen = StackNavigator({
   Home: { screen: Home, path: 'Home' },
   Create: { screen: Create, path: 'Create' },
+  Setting: { screen: Setting, path: 'Setting' },
 }, {
   navigationOptions:{
     headerStyle: {

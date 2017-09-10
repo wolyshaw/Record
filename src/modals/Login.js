@@ -33,9 +33,6 @@ export default class Login extends Component {
     let { open } = this.props
     return (
       <View>
-        <StatusBar
-          barStyle="default"
-        />
         <Modal
           animationType={'slide'}
           transparent={false}
