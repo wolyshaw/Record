@@ -11,15 +11,11 @@ import {
   ActionSheetIOS,
   TouchableOpacity
 } from 'react-native'
-import { lean, APP_ID, APP_KEY } from '../../util'
+import { lean, dispatch } from '../../util'
+import { userinfo, loading } from '../../actions/user'
 import ImagePicker from 'react-native-image-picker'
 import Picker from 'react-native-picker'
 import AV from 'leancloud-storage'
-console.log(lean)
-// AV.init({
-//   appId: APP_ID,
-//   appKey: APP_KEY
-// })
 var photoOptions = {
     //底部弹出框选项
     title:'请选择',
@@ -47,13 +43,12 @@ export default class Create extends Component {
     this.state = {
       list: [],
       contents: [],
+      content: '',
+      title: '',
       avatarSource: null,
       date: '请选择时间'
     }
-  }
-
-  _submit(e) {
-    e.preventDefault()
+    this.createItem = this._createItem.bind(this)
   }
 
   cameraAction = () =>{
@@ -68,14 +63,13 @@ export default class Create extends Component {
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
       } else {
-        this.state.list.push(response)
         let source = { uri: response.uri };
           this.setState({
             avatarSource: source
           });
           let file = new AV.File(response.fileName, { blob: response });
           file.save().then(r => {
-            console.log(r)
+            this.state.list.push(r)
           }, err => console.log(err))
         }
       })
@@ -155,6 +149,20 @@ _showDatePicker() {
     Picker.show()
 }
 
+  _createItem() {
+    let { title, content, list } = this.state
+    const record = AV.Object.extend('record')
+    let Record = new record()
+    Record.set('title', title)
+    Record.set('content', content)
+    Record.set('images', list)
+    dispatch(loading({visible: true}))
+    Record.save().then(r => {
+      dispatch(loading({visible: false}))
+    })
+    console.log(Record)
+  }
+
   render() {
     return (
       <View style={ styles.container }>
@@ -166,7 +174,12 @@ _showDatePicker() {
             <Text style={ styles.name }>
               <Image style={{width: 20, height: 20}} source={ require('../../../static/title.png') }/>
             </Text>
-            <TextInput style={ styles.value } placeholder="请输入主题"/>
+            <TextInput
+              style={ styles.value }
+              value={ this.state.title }
+              placeholder="请输入主题"
+              onChangeText={ text => this.setState({ title: text }) }
+            />
           </View>
           <View style={ styles.item }>
             <Text style={ styles.name }>
@@ -178,7 +191,13 @@ _showDatePicker() {
           </View>
           <View style={ styles.item }>
             <Text style={ styles.name }>内容：</Text>
-            <TextInput style={ styles.content } placeholder="请输入内容" multiline/>
+            <TextInput
+              style={ styles.content }
+              value={ this.state.content }
+              placeholder="请输入内容"
+              multiline
+              onChangeText={ text => this.setState({ content: text }) }
+            />
           </View>
           <View style={ styles.images }>
             {
@@ -192,10 +211,10 @@ _showDatePicker() {
               <Image style={ styles.addImage } source={require('../../../static/add_photos.png')}/>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity>
-            <View>
-              <Text style={{ borderRadius: 5, overflow: 'hidden', flex: 1, backgroundColor: '#E21A43', color: '#fff', textAlign: 'center', height: 40, lineHeight: 40, margin: 10 }}>提交</Text>
-            </View>
+          <TouchableOpacity
+            onPress={ this.createItem }
+          >
+            <Text style={ styles.button }>提交</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -276,5 +295,16 @@ const styles = StyleSheet.create({
   addImage: {
     width: 100,
     height: 100,
+  },
+  button: {
+    borderRadius: 5,
+    overflow: 'hidden',
+    flex: 1,
+    backgroundColor: '#E21A43',
+    color: '#fff',
+    textAlign: 'center',
+    height: 40,
+    lineHeight: 40,
+    margin: 10
   }
 })

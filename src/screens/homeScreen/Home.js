@@ -17,7 +17,7 @@ import AV from 'leancloud-storage'
 
 import Login from '../../modals/Login'
 
-let query = new AV.Query('Contents')
+let query = new AV.Query('record')
 
 const addZore = num => num < 10 ? '0' + num : num
 
@@ -107,24 +107,25 @@ class Home extends Component {
 // }, function (error) {
 //   console.log(error)
 // });
-console.log(this.props)
-    // AV.User.logOut()
     AV.User.currentAsync().then(user => {
       dispatch(userinfo(user))
       dispatch(loading({visible: false}))
       if (this.props.user) {
-        query.find().then(r => this.setState({contents: r}, () => console.log(r)))
+        query.find().then(r => {
+          this.setState({contents: r}, () => console.log(r))
+        })
       }
     })
   }
 
   render() {
+    let { contents } = this.state
     return (
       <ScrollView style={ styles.container }>
         <StatusBar
           barStyle="light-content"
         />
-      { this.state.contents.length ? <Contents contents={this.state.contents}/> : <NullList onPress={ () => this.props.navigation.navigate('Create') }/> }
+      { contents.length ? <Contents contents={ contents }/> : <NullList onPress={ () => this.props.navigation.navigate('Create') }/> }
       </ScrollView>
     )
   }
