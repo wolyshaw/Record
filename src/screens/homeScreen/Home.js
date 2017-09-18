@@ -21,7 +21,7 @@ let query = new AV.Query('record')
 
 const addZore = num => num < 10 ? '0' + num : num
 
-const Contonts = props => {
+const Contents = props => {
   return (
     <View>
       {
@@ -119,7 +119,7 @@ class Home extends Component {
   }
 
   render() {
-    let { contents } = this.state
+    let { contents = [] } = this.state
     return (
       <ScrollView style={ styles.container }>
         <StatusBar
