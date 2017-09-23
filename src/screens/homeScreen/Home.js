@@ -29,14 +29,13 @@ const Images = props => {
       style={{
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'flex-start' ,
-        flexGrow: 3,
+        justifyContent: 'flex-start',
         flexWrap: 'wrap'
       }}
     >
       {
         list.map(item => {
-          return <Image key={ item.id } style={{ flex: 1, height: 60 }} source={{ uri: item.attributes.url }}/>
+          return <Image key={ item.id } style={{ width: 97, height: 97, marginRight: 10, marginBottom: 10 }} source={{ uri: item.attributes.url }}/>
         })
       }
     </View>
@@ -98,10 +97,10 @@ class Home extends Component {
     // dispatch(loading({visible: true}))
     if (this.props.user) {
       query.include('images')
-      query.find().then(r => {
+      query.descending('createdAt').find().then(r => {
         this.loading = false
         // dispatch(loading({visible: false}))
-        this.setState({contents: r}, () => console.log(r))
+        this.setState({contents: r})
       })
     }
   }
@@ -136,6 +135,7 @@ class Home extends Component {
           style={ styles.container }
           data={ contents }
           onRefresh={ this.loadContents }
+          onEndReachedThreshold={ () => alert('12') }
           refreshing={ this.loading }
           keyExtractor={ item => item.id }
           ListEmptyComponent={ <NullList onPress={ () => this.props.navigation.navigate('Create') }/> }
@@ -190,9 +190,10 @@ const styles = StyleSheet.create({
   contents: {
     padding: 10,
     flexDirection: 'row',
+    marginTop: 20,
   },
   content: {
-
+    marginTop: 10
   },
   data: {
     width: 50,

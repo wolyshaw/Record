@@ -68,7 +68,7 @@ export default class Create extends Component {
           dispatch(loading({visible: true}))
           file.save().then(r => {
             dispatch(loading({visible: false}))
-            this.state.list.push(response)
+            this.state.list.push(r)
           }, err => alert(err))
         }
       })
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    backgroundColor: 'rgba(0, 0, 0, 0.1)'
   },
   addImage: {
     width: 100,
