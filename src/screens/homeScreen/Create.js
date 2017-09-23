@@ -17,18 +17,17 @@ import ImagePicker from 'react-native-image-picker'
 import Picker from 'react-native-picker'
 import AV from 'leancloud-storage'
 var photoOptions = {
-    //底部弹出框选项
-    title:'请选择',
-    cancelButtonTitle:'取消',
-    takePhotoButtonTitle:'拍照',
-    chooseFromLibraryButtonTitle:'选择相册',
-    quality:0.75,
-    allowsEditing:true,
-    noData:false,
-    storageOptions: {
-        skipBackup: true,
-        path:'images'
-    }
+  title:'请选择',
+  cancelButtonTitle:'取消',
+  takePhotoButtonTitle:'拍照',
+  chooseFromLibraryButtonTitle:'选择相册',
+  quality:0.75,
+  allowsEditing:true,
+  noData:false,
+  storageOptions: {
+    skipBackup: true,
+    path:'images'
+  }
 }
 
 let query = new AV.Query('_User')
@@ -52,25 +51,25 @@ export default class Create extends Component {
   }
 
   cameraAction = () =>{
-
     ImagePicker.showImagePicker(photoOptions, (response) => {
-      console.log('Response = ', response);
 
       if (response.didCancel) {
-        console.log('User cancelled image picker');
+        alert(response.didCancel)
       } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
+        alert(response.error)
       } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
+        alert(response.customButton)
       } else {
-        let source = { uri: response.uri };
+        let source = { uri: response.uri }
           this.setState({
             avatarSource: source
-          });
-          let file = new AV.File(response.fileName, { blob: response });
+          })
+          let file = new AV.File(response.fileName, { blob: response })
+          dispatch(loading({visible: true}))
           file.save().then(r => {
-            this.state.list.push(r)
-          }, err => console.log(err))
+            dispatch(loading({visible: false}))
+            this.state.list.push(response)
+          }, err => alert(err))
         }
       })
     }
@@ -92,63 +91,6 @@ export default class Create extends Component {
     })
   }
 
-  _createDateData() {
-    let date = [],
-      time = new Date()
-    for(let i = time.getFullYear(); i < time.getFullYear() + 10; i++) {
-        let month = []
-        for(let j = 1;j<13;j++) {
-            let day = []
-            if(j === 2) {
-                for(let k=1;k<29;k++) {
-                    day.push(k+'日')
-                }
-                if(i%4 === 0) {
-                    day.push(29+'日')
-                }
-            } else if(j in {1:1, 3:1, 5:1, 7:1, 8:1, 10:1, 12:1}) {
-                for(let k=1;k<32;k++){
-                    day.push(k+'日')
-                }
-            } else {
-                for(let k=1;k<31;k++) {
-                    day.push(k+'日')
-                }
-            }
-            let _month = {}
-            _month[j+'月'] = day
-            month.push(_month)
-        }
-        let _date = {}
-        _date[i+'年'] = month
-        date.push(_date)
-    }
-    return date
-}
-
-_showDatePicker() {
-    Picker.init({
-      pickerData: this._createDateData(),
-      pickerToolBarFontSize: 16,
-      pickerFontSize: 16,
-      pickerTitleText: '请选择时间',
-      pickerConfirmBtnText: '确定',
-      pickerCancelBtnText: '取消',
-      pickerBg: [255, 255 ,255, 1],
-      pickerFontColor: [0, 0 ,0, 1],
-      onPickerConfirm: (pickedValue, pickedIndex) => {
-        this.setState({ date: pickedValue.join(' ') })
-      },
-      onPickerCancel: (pickedValue, pickedIndex) => {
-          console.log('date', pickedValue, pickedIndex);
-      },
-      onPickerSelect: (pickedValue, pickedIndex) => {
-        this.setState({ date: pickedValue.join(' ') })
-      }
-    });
-    Picker.show()
-}
-
   _createItem() {
     let { title, content, list } = this.state
     const record = AV.Object.extend('record')
@@ -159,8 +101,8 @@ _showDatePicker() {
     dispatch(loading({visible: true}))
     Record.save().then(r => {
       dispatch(loading({visible: false}))
+      this.props.navigation.goBack()
     })
-    console.log(Record)
   }
 
   render() {
@@ -180,14 +122,6 @@ _showDatePicker() {
               placeholder="请输入主题"
               onChangeText={ text => this.setState({ title: text }) }
             />
-          </View>
-          <View style={ styles.item }>
-            <Text style={ styles.name }>
-              <Image style={{width: 20, height: 20}} source={ require('../../../static/date.png') }/>
-            </Text>
-            <TouchableOpacity style={ styles.chooseTime } onPress={ this._showDatePicker.bind(this) }>
-              <Text>{ this.state.date }</Text>
-            </TouchableOpacity>
           </View>
           <View style={ styles.item }>
             <Text style={ styles.name }>内容：</Text>
@@ -262,12 +196,14 @@ const styles = StyleSheet.create({
   },
   value: {
     lineHeight: 40,
-    fontSize: 14
+    fontSize: 14,
+    flex: 1
   },
   content: {
     lineHeight: 40,
     fontSize: 14,
     height: 80,
+    flex: 1
   },
   chooseTime: {
     marginTop: 10,

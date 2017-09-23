@@ -4,6 +4,7 @@ import {
   Text,
   View,
   Image,
+  FlatList,
   StatusBar,
   ScrollView,
   DatePickerIOS,
@@ -21,24 +22,21 @@ let query = new AV.Query('record')
 
 const addZore = num => num < 10 ? '0' + num : num
 
-const Contents = props => {
+const Images = props => {
+  let { list = [] } = props
   return (
-    <View>
+    <View
+      style={{
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start' ,
+        flexGrow: 3,
+        flexWrap: 'wrap'
+      }}
+    >
       {
-        props.contents.map(item => {
-          let time = new Date(item.createdAt)
-          return (
-            <View key={item.id} style={ styles.contents }>
-              <View style={ styles.content }>
-                <Text style={ styles.data }>
-                  {
-                    `${addZore(time.getMonth() + 1)}/${addZore(time.getDay())}`
-                  }
-                  </Text>
-              </View>
-              <Text style={ styles.content }>{item.attributes.content}</Text>
-            </View>
-          )
+        list.map(item => {
+          return <Image key={ item.id } style={{ flex: 1, height: 60 }} source={{ uri: item.attributes.url }}/>
         })
       }
     </View>
@@ -91,10 +89,24 @@ class Home extends Component {
       contents: [],
       avatarSource: {}
     }
+    this.loadContents = this._loadContents.bind(this)
+    this.loading = false
+  }
+
+  _loadContents() {
+    this.loading = true
+    // dispatch(loading({visible: true}))
+    if (this.props.user) {
+      query.include('images')
+      query.find().then(r => {
+        this.loading = false
+        // dispatch(loading({visible: false}))
+        this.setState({contents: r}, () => console.log(r))
+      })
+    }
   }
 
   componentWillMount() {
-    dispatch(loading({visible: true}))
 //     var user = new AV.User();
 // // 设置用户名
 // user.setUsername('wolyshaw');
@@ -109,24 +121,50 @@ class Home extends Component {
 // });
     AV.User.currentAsync().then(user => {
       dispatch(userinfo(user))
-      dispatch(loading({visible: false}))
-      if (this.props.user) {
-        query.find().then(r => {
-          this.setState({contents: r}, () => console.log(r))
-        })
-      }
+      this.loadContents()
     })
   }
 
   render() {
     let { contents = [] } = this.state
     return (
-      <ScrollView style={ styles.container }>
+      <View style={{ flex: 1 }}>
         <StatusBar
           barStyle="light-content"
         />
-      { contents.length ? <Contents contents={ contents }/> : <NullList onPress={ () => this.props.navigation.navigate('Create') }/> }
-      </ScrollView>
+        <FlatList
+          style={ styles.container }
+          data={ contents }
+          onRefresh={ this.loadContents }
+          refreshing={ this.loading }
+          keyExtractor={ item => item.id }
+          ListEmptyComponent={ <NullList onPress={ () => this.props.navigation.navigate('Create') }/> }
+          renderItem={ (item) => {
+            let time = new Date(item.item.createdAt)
+            let attributes = item.item.attributes || {}
+            return (
+              <View key={item.id} style={ styles.contents }>
+                <View style={ styles.content }>
+                  <Text style={ styles.data }>
+                    {
+                      `${addZore(time.getMonth() + 1)}/${addZore(time.getDate())}`
+                    }
+                    </Text>
+                </View>
+                {
+                  attributes.images.length ? (
+                    <View style={{ flex: 1 }}>
+                      <Images list={ attributes.images }/>
+                      <Text style={ styles.content }>{attributes.content}</Text>
+                    </View>
+                  ) : <Text style={ styles.content }>{attributes.content}</Text>
+                }
+
+              </View>
+            )
+          } }
+        />
+      </View>
     )
   }
 }
